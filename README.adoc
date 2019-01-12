@@ -10,7 +10,7 @@ All about testing and simple app
       
     * https://github.com/kopiitem/random/tree/master/gamsuit[gamsuit]
     
-      simple game(stone, papper, scissors)
+      simple game client-server(stone, papper, scissors) with JFrame. Build with socket connection
 
     * https://github.com/kopiitem/random/tree/master/login-jaas[login-jaas]
     
