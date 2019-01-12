@@ -1,0 +1,41 @@
+# Random
+
+All about testing and simple app
+
+.For testing code:
+      
+    * https://github.com/kopiitem/random/tree/master/find-food[find-food]
+      
+      testing for spring web-socket with implement roulette wheel to select the food
+      
+    * https://github.com/kopiitem/random/tree/master/gamsuit[gamsuit]
+    
+      simple game(stone, papper, scissors)
+
+    * https://github.com/kopiitem/random/tree/master/login-jaas[login-jaas]
+    
+      simple login with jaas
+      
+    * https://github.com/kopiitem/random/tree/master/poker[poker] 
+    
+      simple game poker
+      
+    * https://github.com/kopiitem/random/tree/master/springboot-testdb[springboot-testdb ]
+    
+      sample init test db
+      
+    * https://github.com/kopiitem/random/tree/master/timer[timer]
+    
+      Implement Alarm timer from java with javax.sound
+    
+    * https://github.com/kopiitem/random/tree/master/upload[upload]
+    
+      Transfering files based on SVN log to another server with JFrame
+
+
+
+
+
+
+
+
