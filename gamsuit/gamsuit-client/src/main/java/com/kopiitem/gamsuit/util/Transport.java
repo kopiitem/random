@@ -15,8 +15,8 @@ import java.util.logging.Logger;
 public class Transport {
 
     protected Socket socket;
-    private String server;
-    private int port;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
 
     public Transport() {
     }
@@ -24,6 +24,17 @@ public class Transport {
     public void create(String server, int port) {
         try {
             this.socket = new Socket(server, port);
+            initStreams();
+        } catch (IOException ex) {
+            Logger.getLogger(Transport.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void initStreams() {
+        try {
+            this.out = new ObjectOutputStream(socket.getOutputStream());
+            this.out.flush();
+            this.in = new ObjectInputStream(socket.getInputStream());
         } catch (IOException ex) {
             Logger.getLogger(Transport.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -31,8 +42,9 @@ public class Transport {
 
     public void send(Player data) {
         try {
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             out.writeObject(data);
+            out.flush();
+            out.reset();
         } catch (IOException ex) {
             Logger.getLogger(Transport.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -40,7 +52,7 @@ public class Transport {
 
     public Player read() {
         try {
-            return (Player) new ObjectInputStream(socket.getInputStream()).readObject();
+            return (Player) in.readObject();
         } catch (IOException ex) {
             Logger.getLogger(Transport.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
