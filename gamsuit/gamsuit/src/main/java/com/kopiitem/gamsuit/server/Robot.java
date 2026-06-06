@@ -5,8 +5,8 @@ import com.kopiitem.gamsuit.util.Constants;
 import com.kopiitem.gamsuit.util.Transport;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +21,7 @@ public class Robot extends Transport {
     private String robotName[] = {"Donny", "Wice", "Vincent", "Batman", "Superman", "Robin", "Sheena"};
 
     public Robot() {
-        players = new ArrayList<Player>();
+        players = new CopyOnWriteArrayList<Player>();
     }
 
     public void execute() {

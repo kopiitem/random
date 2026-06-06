@@ -1,13 +1,12 @@
 package com.kopiitem.gamsuit.client;
 
 import com.kopiitem.gamsuit.util.CommandEnum;
-import java.io.Serializable;
 
 /**
  *
  * @author donny.fm
  */
-public class Player implements Serializable {
+public class Player {
 
     private Information user;
     private Information robot;
