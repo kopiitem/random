@@ -5,7 +5,6 @@ import com.kopiitem.gamsuit.client.Player;
 import com.kopiitem.gamsuit.util.BidEnum;
 import com.kopiitem.gamsuit.util.CommandEnum;
 import com.kopiitem.gamsuit.util.Transport;
-import java.awt.TrayIcon;
 import javax.swing.JOptionPane;
 
 /**
@@ -24,7 +23,6 @@ public class Board extends javax.swing.JFrame {
         initComponents();
         player = new Player();
         transport = new Transport();
-
     }
 
     /**
@@ -272,37 +270,68 @@ public class Board extends javax.swing.JFrame {
 
     private void connectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectBtnActionPerformed
         if (serverTxt.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Please Type Server location!", "Error Message", TrayIcon.MessageType.ERROR.ordinal());
+            JOptionPane.showMessageDialog(null, "Please Type Server location!", "Error Message", JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (portTxt.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Please Type Server location!", "Error Message", TrayIcon.MessageType.ERROR.ordinal());
+            JOptionPane.showMessageDialog(null, "Please Type Port!", "Error Message", JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (playerNameTxt.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Please Type Player Name!", "Error Message", TrayIcon.MessageType.ERROR.ordinal());
+            JOptionPane.showMessageDialog(null, "Please Type Player Name!", "Error Message", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        int port;
+        try {
+            port = Integer.parseInt(portTxt.getText());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Port must be a number!", "Error Message", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        transport.create(serverTxt.getText(), Integer.parseInt(portTxt.getText()));
-        player.getUser().setName(playerNameTxt.getText());
-        player.setCommandEnum(CommandEnum.HANDSHAKE);
-        transport.send(player);
-        player = transport.read();
-        if (player.getCommandEnum() == CommandEnum.CONNECTED) {
-            serverTxt.setEnabled(false);
-            portTxt.setEnabled(false);
-            playerNameTxt.setEnabled(false);
-            connectBtn.setEnabled(false);
-            connectBtn.setText("Connected");
+        connectBtn.setEnabled(false);
+        connectBtn.setText("Connecting...");
 
-            printPlayerInformation();
+        final String server = serverTxt.getText();
+        final String playerName = playerNameTxt.getText();
+        final int finalPort = port;
 
-            player.setCommandEnum(CommandEnum.CONNECTED);
+        new javax.swing.SwingWorker<Player, Void>() {
+            @Override
+            protected Player doInBackground() {
+                transport.create(server, finalPort);
+                player.getUser().setName(playerName);
+                player.setCommandEnum(CommandEnum.HANDSHAKE);
+                transport.send(player);
+                return transport.read();
+            }
 
-        }
-
+            @Override
+            protected void done() {
+                try {
+                    Player result = get();
+                    if (result != null && result.getCommandEnum() == CommandEnum.CONNECTED) {
+                        player = result;
+                        serverTxt.setEnabled(false);
+                        portTxt.setEnabled(false);
+                        playerNameTxt.setEnabled(false);
+                        connectBtn.setText("Connected");
+                        printPlayerInformation();
+                        player.setCommandEnum(CommandEnum.CONNECTED);
+                    } else {
+                        connectBtn.setEnabled(true);
+                        connectBtn.setText("Connect");
+                        JOptionPane.showMessageDialog(null, "Failed to connect to server!", "Error Message", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    connectBtn.setEnabled(true);
+                    connectBtn.setText("Connect");
+                    JOptionPane.showMessageDialog(null, "Connection error: " + ex.getMessage(), "Error Message", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }.execute();
     }//GEN-LAST:event_connectBtnActionPerformed
+
     private void printPlayerInformation() {
         Information user = player.getUser();
         Information robot = player.getRobot();
@@ -321,14 +350,38 @@ public class Board extends javax.swing.JFrame {
         if (robot.getBid() != null) {
             secondBetLabel.setText(robot.getBid().name());
         }
-
     }
 
     private void send(CommandEnum commandEnum) {
         player.setCommandEnum(commandEnum);
-        transport.send(player);
-        player = transport.read();
-        printPlayerInformation();
+        stoneBtn.setEnabled(false);
+        scissorBtn.setEnabled(false);
+        paperBtn.setEnabled(false);
+
+        new javax.swing.SwingWorker<Player, Void>() {
+            @Override
+            protected Player doInBackground() {
+                transport.send(player);
+                return transport.read();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    Player result = get();
+                    if (result != null) {
+                        player = result;
+                        printPlayerInformation();
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Connection lost: " + ex.getMessage(), "Error Message", JOptionPane.ERROR_MESSAGE);
+                } finally {
+                    stoneBtn.setEnabled(true);
+                    scissorBtn.setEnabled(true);
+                    paperBtn.setEnabled(true);
+                }
+            }
+        }.execute();
     }
 
     private void stoneBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stoneBtnActionPerformed

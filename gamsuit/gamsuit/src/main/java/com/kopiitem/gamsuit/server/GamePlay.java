@@ -13,6 +13,8 @@ import com.kopiitem.gamsuit.util.Transport;
 public class GamePlay extends Transport implements Runnable {
 
     private Robot robot;
+    private int playerScore = 0;
+    private int robotScore = 0;
 
     public GamePlay(Robot robot) {
         this.robot = robot;
@@ -32,6 +34,8 @@ public class GamePlay extends Transport implements Runnable {
                     case HANDSHAKE:
                         Information iUser = player.getUser();
                         Information iRobot = player.getRobot();
+                        playerScore = 0;
+                        robotScore = 0;
                         iUser.setScore(0);
                         iRobot.setName(robot.getRobotName()[(int) (Math.random() * robot.getRobotName().length)]);
                         iRobot.setScore(0);
@@ -44,19 +48,18 @@ public class GamePlay extends Transport implements Runnable {
                         int x = (int) (Math.random() * BidEnum.values().length);
                         BidEnum bidEnum = BidEnum.values()[x];
                         player.getRobot().setBid(bidEnum);
-                        int current = 0;
                         switch (AI.getResult(player.getUser().getBid(), bidEnum)) {
                             case ROBOT:
-                                current = player.getRobot().getScore();
-                                player.getRobot().setScore(current + 1);
+                                robotScore++;
                                 break;
                             case PLAYER:
-                                current = player.getUser().getScore();
-                                player.getUser().setScore(current + 1);
+                                playerScore++;
                                 break;
                             case DRAW:
                                 break;
                         }
+                        player.getUser().setScore(playerScore);
+                        player.getRobot().setScore(robotScore);
                         send(player);
                         break;
                     case CLOSE:
